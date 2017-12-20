@@ -1,0 +1,9 @@
+D:\limudim\project\CloudProject\bin\Debug\netcoreapp1.1\project.deps.json
+D:\limudim\project\CloudProject\bin\Debug\netcoreapp1.1\project.runtimeconfig.json
+D:\limudim\project\CloudProject\bin\Debug\netcoreapp1.1\project.runtimeconfig.dev.json
+D:\limudim\project\CloudProject\obj\Debug\netcoreapp1.1\project.csproj.CoreCompileInputs.cache
+D:\limudim\project\CloudProject\obj\Debug\netcoreapp1.1\project.AssemblyInfo.cs
+D:\limudim\project\CloudProject\bin\Debug\netcoreapp1.1\project.dll
+D:\limudim\project\CloudProject\bin\Debug\netcoreapp1.1\project.pdb
+D:\limudim\project\CloudProject\obj\Debug\netcoreapp1.1\project.dll
+D:\limudim\project\CloudProject\obj\Debug\netcoreapp1.1\project.pdb

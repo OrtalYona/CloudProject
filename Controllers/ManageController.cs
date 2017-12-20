@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace project.Controllers
+namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
     public class ManageController : Controller

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using project.Models;
+using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 
 //test git--------------
-namespace project.Controllers
+namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
     public class AccountController : Controller
@@ -26,7 +26,10 @@ namespace project.Controllers
             if (!response.IsSuccessStatusCode)
                 return false;
             
-            var token = (Token) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Token));
+            string json = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(json);
+
+            var token = (Token) JsonConvert.DeserializeObject(json,typeof(Token));
 
             //if (token.create + token.ttl > now)
 
@@ -41,12 +44,12 @@ namespace project.Controllers
         {
 
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.GetAsync("users/"+u._id);
+            var response = await hc.GetAsync("users/"+a.ID);
             if (response.IsSuccessStatusCode) {
                 Account account = (Account) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Account));
                 if (account.password.Equals(a.password)) {
                     Token t = new Token();
-                    t._id = u._id+":token:"+Guid.NewGuid();
+                    t._id = a.ID+":token:"+Guid.NewGuid();
                     t.create = DateTime.Now;
                     t.ttl = 600;
 
@@ -68,7 +71,7 @@ namespace project.Controllers
 
             async  Task<Boolean> DoesUserExist(Account a) {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.GetAsync("users/"+u._id);
+            var response = await hc.GetAsync("users/"+a.ID);
             if (response.IsSuccessStatusCode) {
                 return true;
             }
@@ -106,9 +109,10 @@ namespace project.Controllers
         public void Delete([FromBody] Account a)
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
+            
            // string json = JsonConvert.SerializeObject(a);
            // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.Delete("users/"+u._id));
+           // var response = await hc.Delete("users/));
         }
     }
 }

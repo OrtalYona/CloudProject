@@ -1,15 +1,15 @@
 
 using System;
 
-namespace Project.Models
+namespace CloudProject.Models
 {
 public class Maneger
 {
-    public Boleean HasPassword{get; set;}
-    public IList<UserLogInInfo> Login{get; set;}
+    public bool HasPassword{get; set;}
+   // public List<UserLogInInfo> Login{get; set;}
     public string PhoneNumber{get; set;}
-    public Boleean ToFactor{get; set;}
-    public Boleean BrowserRemembered{get; set;}
+    public bool ToFactor{get; set;}
+    public bool BrowserRemembered{get; set;}
     
 
 }

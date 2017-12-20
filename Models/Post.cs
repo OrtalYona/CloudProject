@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Project.Models
+namespace CloudProject.Models
 {
 public class Post
 {

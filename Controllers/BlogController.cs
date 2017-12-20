@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using project.Models;
+using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace project.Controllers
+
+namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
     public class BlogController : Controller
@@ -59,7 +60,7 @@ namespace project.Controllers
             var hc = Helpers.CouchDBConnect.GetClient("posts");
            // string json = JsonConvert.SerializeObject(a);
            // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.Delete("posts/"+p._id));
+           // var response = await hc.Delete("posts/"+p._id);
         }
     }
 }
