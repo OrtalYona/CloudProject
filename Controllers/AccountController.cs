@@ -44,12 +44,12 @@ namespace CloudProject.Controllers
         {
 
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.GetAsync("users/"+a.ID);
+            var response = await hc.GetAsync("users/"+a._id);
             if (response.IsSuccessStatusCode) {
                 Account account = (Account) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Account));
                 if (account.password.Equals(a.password)) {
                     Token t = new Token();
-                    t._id = a.ID+":token:"+Guid.NewGuid();
+                    t._id = a._id+":token:"+Guid.NewGuid();
                     t.create = DateTime.Now;
                     t.ttl = 600;
 
@@ -71,7 +71,7 @@ namespace CloudProject.Controllers
 
             async  Task<Boolean> DoesUserExist(Account a) {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.GetAsync("users/"+a.ID);
+            var response = await hc.GetAsync("users/"+a._id);
             if (response.IsSuccessStatusCode) {
                 return true;
             }
@@ -81,7 +81,7 @@ namespace CloudProject.Controllers
 
 
         [HttpPost]
-        [Route("CreateUser")]
+        [Route("CreateUser/{_id}")]
         public async Task<int> CreateUser([FromBody] Account a) {
             var doesExist = await DoesUserExist(a);
             if (doesExist) {
@@ -105,14 +105,13 @@ namespace CloudProject.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete([FromBody] Account a)
+        [HttpDelete("DeleteUser/{_id}")]
+        public async Task<int> Delete(string _id)
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            
-           // string json = JsonConvert.SerializeObject(a);
-           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-           // var response = await hc.Delete("users/));
+            var response = await hc.DeleteAsync("/users/"+_id);
+            Console.WriteLine(response);
+            return 1;
         }
     }
 }
