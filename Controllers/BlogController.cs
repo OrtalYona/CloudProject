@@ -47,5 +47,27 @@ namespace CloudProject.Controllers
             return 1;
         }
 
+        [HttpPut]
+        [Route("UpdatePost/{_id}")]
+        public async Task<int> UpdatePost([FromBody] Post p) {
+
+            var hc = Helpers.CouchDBConnect.GetClient("posts");
+            string json = JsonConvert.SerializeObject(p);
+            HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response = await hc.PutAsync("posts/"+p.ID,htc);
+            Console.WriteLine(response);
+            return 1;
+        }
+
+        [HttpDelete]
+        [Route("DeletePost/{_id}")]
+        public async Task<int> DeleteUser(string _id)  
+        {
+            var hc = Helpers.CouchDBConnect.GetClient("posts");
+            var response = await hc.DeleteAsync("posts/"+_id);
+            Console.WriteLine(response);
+            return 1;
+        }
+
     }
 }

@@ -7,7 +7,6 @@ using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-//test git--------------
 namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
@@ -30,8 +29,6 @@ namespace CloudProject.Controllers
             Console.WriteLine(json);
 
             var token = (Token) JsonConvert.DeserializeObject(json,typeof(Token));
-
-            //if (token.create + token.ttl > now)
 
             if (token.create.AddSeconds(token.ttl).CompareTo(DateTime.Now) > 0) {
                 return true;

@@ -15,11 +15,32 @@ namespace CloudProject.Controllers
     [Route("api/[controller]")]
     public class OrderTableController : Controller
     {
+
+        
         [HttpPost]
-        [Route("Create")]
+        public async Task<dynamic> Post([FromBody]OrderTable order)
+        {
+            var hc = Helpers.CouchDBConnect.GetClient("orders");
+            var response = await hc.GetAsync("orders/"+order.ID);
+            if (response.IsSuccessStatusCode) {
+                Post posts = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(OrderTable));
+
+                string json = JsonConvert.SerializeObject(order);
+                HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+                await hc.PostAsync("orders", htc);
+
+                return 1;
+
+            }
+            
+        return -1;
+        }
+
+        [HttpPost]
+        [Route("CreateOrder")]
         public async Task<int> CreateOrder([FromBody] OrderTable ot) {
 
-            var hc = Helpers.CouchDBConnect.GetClient("users");
+            var hc = Helpers.CouchDBConnect.GetClient("orders");
             string json = JsonConvert.SerializeObject(ot);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
@@ -28,12 +49,6 @@ namespace CloudProject.Controllers
             return 1;
         }
 
-        // [HttpGet]
-        // [Route("Order/{id}")]
-        //  public OrderTable GetOrder(string id) {
-             
-        //      return 
-        //  }
     
     }
 }
