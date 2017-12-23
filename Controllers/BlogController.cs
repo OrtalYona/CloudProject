@@ -15,7 +15,27 @@ namespace CloudProject.Controllers
     {
 
         [HttpPost]
-        [Route("CreatePost")]
+        public async Task<dynamic> Post([FromBody]Post p)
+        {
+            var hc = Helpers.CouchDBConnect.GetClient("posts");
+            var response = await hc.GetAsync("posts/"+p.ID);
+            if (response.IsSuccessStatusCode) {
+                Post posts = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
+
+                string json = JsonConvert.SerializeObject(p);
+                HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+                await hc.PostAsync("posts", htc);
+
+                return 1;
+
+            }
+            
+        return -1;
+
+        }
+
+        [HttpPost]
+        [Route("CreatePost/{_id}")]
         public async Task<int> CreatePost([FromBody] Post p) {
 
             var hc = Helpers.CouchDBConnect.GetClient("posts");
@@ -27,40 +47,5 @@ namespace CloudProject.Controllers
             return 1;
         }
 
-        // GET api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete([FromBody] Post p)
-        {
-            var hc = Helpers.CouchDBConnect.GetClient("posts");
-           // string json = JsonConvert.SerializeObject(a);
-           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-           // var response = await hc.Delete("posts/"+p._id);
-        }
     }
 }

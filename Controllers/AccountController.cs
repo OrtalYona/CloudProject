@@ -97,16 +97,23 @@ namespace CloudProject.Controllers
             return 1;
         }
 
+        [HttpPut]
+        [Route("UpdateUser/{_id}")]
+        public async Task<int> UpdateUser([FromBody] Account a) {
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            var hc = Helpers.CouchDBConnect.GetClient("users");
+            string json = JsonConvert.SerializeObject(a);
+            HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response = await hc.PutAsync("/users/"+a._id,htc);
+            Console.WriteLine(response);
+            return 1;
         }
 
-        // DELETE api/values/5
-        [HttpDelete("DeleteUser/{_id}")]
-        public async Task<int> Delete(string _id)
+
+        [HttpDelete]
+        [Route("DeleteUser/{_id}")]
+        //[HttpDelete("DeleteUser/{_id}")]
+        public async Task<int> DeleteUser(string _id)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
             var response = await hc.DeleteAsync("/users/"+_id);

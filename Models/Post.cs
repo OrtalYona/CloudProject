@@ -1,11 +1,12 @@
 
 
 using System;
+using System.Collections.Generic;
 
 namespace CloudProject.Models
 {
-public class Post
-{
+    public class Post
+    {
 
     public int ID{get; set;}
     public String Title{get; set;}
@@ -18,6 +19,6 @@ public class Post
     public String RFeatures{get; set;}
     public String Address{get; set;}
     public String PhoneNumber{get; set;}
-
-}
+    public List<Comment> Comment{get; set;}
+    }
 }
