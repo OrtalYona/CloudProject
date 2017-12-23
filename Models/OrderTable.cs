@@ -4,7 +4,7 @@ using System;
 namespace CloudProject.Models
 {
 
-    public class Order
+    public class OrderTable
     {
 
     public int ID {get; set;}
@@ -12,7 +12,7 @@ namespace CloudProject.Models
     public String LastName {get; set;}
     public String PhoneNumber {get; set;}
     public int NumOfPeople {get; set;}
-    public DateTime Date {get; set;}
+   // public DateTime Date {get; set;}
     public String time {get; set;}
 
     }
