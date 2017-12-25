@@ -7,23 +7,24 @@ using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 
+
 namespace CloudProject.Controllers
 {
-
     [Route("api/[controller]")]
-
-    public class OrderController: Controller
-    {
-        [HttpPost]
-        public async Task<dynamic> Post([FromBody]OrderTable ot)
-        {
     
-            var hc = Helpers.CouchDBConnect.GetClient("orders");
-            var response = await hc.GetAsync("orders/"+ot.ID);
-            if (response.IsSuccessStatusCode) {
-       // Post posts = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
+    public class OrdersController : Controller
 
-                string json = JsonConvert.SerializeObject(ot);
+    {
+
+        [HttpPost]
+        public async Task<dynamic> Post([FromBody]Orders o)
+        {
+            var hc = Helpers.CouchDBConnect.GetClient("orders");
+            var response = await hc.GetAsync("orders/"+o.ID);
+            if (response.IsSuccessStatusCode) {
+                Orders order = (Orders) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Orders));
+
+                string json = JsonConvert.SerializeObject(o);
                 HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
                 await hc.PostAsync("orders", htc);
 
@@ -34,21 +35,20 @@ namespace CloudProject.Controllers
         return -1;
 
         }
-        
-    
 
         [HttpPost]
-        [Route("CreateOrder/{_id}")]
-        public async Task<int> CreateOrder([FromBody] OrderTable ot) {
+       // [Route("CreateOrder/{_id}")]
+        [Route("CreateOrder")]
+        public async Task<int> CreateOrder([FromBody] Orders o) {
 
             var hc = Helpers.CouchDBConnect.GetClient("orders");
-            string json = JsonConvert.SerializeObject(ot);
+            string json = JsonConvert.SerializeObject(o);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
             
             Console.WriteLine(response);
             return 1;
         }
+
     }
-    
 }

@@ -70,6 +70,10 @@ namespace CloudProject.Controllers
             var hc = Helpers.CouchDBConnect.GetClient("users");
             var response = await hc.GetAsync("users/"+a._id);
             if (response.IsSuccessStatusCode) {
+                if(response.Content != null){
+                    String x = response.Content.ReadAsStringAsync().Result;
+                    int t = 4;
+                }
                 return true;
             }
 
@@ -78,13 +82,16 @@ namespace CloudProject.Controllers
 
 
         [HttpPost]
-        [Route("CreateUser/{_id}")]
+        //[Route("CreateUser/{_id}")]
+        [Route("CreateUser")]
         public async Task<int> CreateUser([FromBody] Account a) {
-            var doesExist = await DoesUserExist(a);
-            if (doesExist) {
-                return -1;
+            if(a._id != null){
+                var doesExist = await DoesUserExist(a);
+                if (doesExist) {
+                    return -1;
+                }
             }
-
+            
             var hc = Helpers.CouchDBConnect.GetClient("users");
             string json = JsonConvert.SerializeObject(a);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
@@ -95,25 +102,25 @@ namespace CloudProject.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateUser/{_id}")]
+        [Route("UpdateUser")]
         public async Task<int> UpdateUser([FromBody] Account a) {
 
             var hc = Helpers.CouchDBConnect.GetClient("users");
             string json = JsonConvert.SerializeObject(a);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.PutAsync("/users/"+a._id,htc);
+            var response = await hc.PutAsync("users/"+a._id,htc);
             Console.WriteLine(response);
             return 1;
         }
 
 
         [HttpDelete]
-        [Route("DeleteUser/{_id}")]
+        [Route("DeleteUser")]
         //[HttpDelete("DeleteUser/{_id}")]
-        public async Task<int> DeleteUser(string _id)  
+        public async Task<int> DeleteUser([FromBody] Account a)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.DeleteAsync("/users/"+_id);
+            var response = await hc.DeleteAsync("/users/_id=" + a._id);
             Console.WriteLine(response);
             return 1;
         }
