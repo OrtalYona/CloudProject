@@ -115,12 +115,15 @@ namespace CloudProject.Controllers
 
 
         [HttpDelete]
-        [Route("DeleteUser")]
+        [Route("DeleteUser/{_id}")]
+        
         //[HttpDelete("DeleteUser/{_id}")]
         public async Task<int> DeleteUser([FromBody] Account a)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            var response = await hc.DeleteAsync("/users/_id=" + a._id);
+           // string json = JsonConvert.SerializeObject(a);
+            //HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response = await hc.DeleteAsync("users/"+a._id);
             Console.WriteLine(response);
             return 1;
         }

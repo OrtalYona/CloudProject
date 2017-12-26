@@ -35,7 +35,7 @@ namespace CloudProject.Controllers
         }
 
         [HttpPost]
-        [Route("CreatePost/{_id}")]
+        [Route("CreatePost")]
         public async Task<int> CreatePost([FromBody] Post p) {
 
             var hc = Helpers.CouchDBConnect.GetClient("posts");

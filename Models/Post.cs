@@ -8,7 +8,7 @@ namespace CloudProject.Models
     public class Post
     {
 
-    public int ID{get; set;}
+    public String _id {get; set;}
     public String Title{get; set;}
     public String Writer{get; set;}
     public String WebSite{get; set;}

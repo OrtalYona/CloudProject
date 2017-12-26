@@ -8,7 +8,7 @@ namespace CloudProject.Models
     public class Manage
     {
 
-    public int ID {get; set;}
+    public string _id {get; set;}
     public List<Account> Accounts{get; set;}
 
 
