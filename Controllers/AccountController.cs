@@ -94,37 +94,45 @@ namespace CloudProject.Controllers
             
             var hc = Helpers.CouchDBConnect.GetClient("users");
             string json = JsonConvert.SerializeObject(a);
+            var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+            jsonObject.Remove("_rev");
+            json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
             
-            Console.WriteLine(response);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             return 1;
         }
 
         [HttpPut]
-        [Route("UpdateUser")]
-        public async Task<int> UpdateUser([FromBody] Account a) {
+        [Route("UpdateUser/{id}")]
+        public async Task<int> UpdateUser(string id,[FromBody] Account u) {
 
             var hc = Helpers.CouchDBConnect.GetClient("users");
-            string json = JsonConvert.SerializeObject(a);
+            var getRev = await hc.GetAsync("users/"+id);
+            var user = (Account) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Account));
+            u._rev=user._rev;
+            string json = JsonConvert.SerializeObject(u);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.PutAsync("users/"+a._id,htc);
-            Console.WriteLine(response);
+            var response = await hc.PutAsync("users/"+id,htc);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             return 1;
         }
 
 
         [HttpDelete]
-        [Route("DeleteUser/{_id}")]
+        [Route("DeleteUser/{id}")]
         
         //[HttpDelete("DeleteUser/{_id}")]
-        public async Task<int> DeleteUser([FromBody] Account a)  
+        public async Task<int> DeleteUser(string id)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("users");
-           // string json = JsonConvert.SerializeObject(a);
-            //HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.DeleteAsync("users/"+a._id);
-            Console.WriteLine(response);
+            var response = await hc.GetAsync("users/"+id);
+            var user = (Account) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Account));
+          //  string json = JsonConvert.SerializeObject(a);
+           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response1 = await hc.DeleteAsync("users/"+user._id+"?rev="+user._rev);
+            Console.WriteLine(response1);
             return 1;
         }
     }

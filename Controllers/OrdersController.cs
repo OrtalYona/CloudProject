@@ -20,7 +20,7 @@ namespace CloudProject.Controllers
         public async Task<dynamic> Post([FromBody]Orders o)
         {
             var hc = Helpers.CouchDBConnect.GetClient("orders");
-            var response = await hc.GetAsync("orders/"+o.ID);
+            var response = await hc.GetAsync("orders/"+o._id);
             if (response.IsSuccessStatusCode) {
                 Orders order = (Orders) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Orders));
 
@@ -43,10 +43,45 @@ namespace CloudProject.Controllers
 
             var hc = Helpers.CouchDBConnect.GetClient("orders");
             string json = JsonConvert.SerializeObject(o);
+            var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+            jsonObject.Remove("_rev");
+            json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
             
             Console.WriteLine(response);
+            return 1;
+        }
+        
+        [HttpPut]
+        [Route("UpdateOrder/{id}")]
+        public async Task<int> UpdateOrder(string id,[FromBody] Orders o) {
+
+            var hc = Helpers.CouchDBConnect.GetClient("orders");
+            var getRev = await hc.GetAsync("orders/"+id);
+            var order = (Orders) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Orders));
+            o._rev=order._rev;
+            string json = JsonConvert.SerializeObject(o);
+            HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response = await hc.PutAsync("orders/"+id,htc);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+            return 1;
+        }
+
+
+        [HttpDelete]
+        [Route("DeleteOrders/{id}")]
+        
+        //[HttpDelete("DeleteUser/{_id}")]
+        public async Task<int> DeleteOrders(string id)  
+        {
+            var hc = Helpers.CouchDBConnect.GetClient("orders");
+            var response = await hc.GetAsync("orders/"+id);
+            var order = (Orders) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Orders));
+          //  string json = JsonConvert.SerializeObject(a);
+           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+            var response1 = await hc.DeleteAsync("users/"+order._id+"?rev="+order._rev);
+            Console.WriteLine(response1);
             return 1;
         }
 

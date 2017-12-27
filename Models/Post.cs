@@ -9,6 +9,7 @@ namespace CloudProject.Models
     {
 
     public String _id {get; set;}
+    public string _rev {get; set;}
     public String Title{get; set;}
     public String Writer{get; set;}
     public String WebSite{get; set;}
@@ -19,6 +20,7 @@ namespace CloudProject.Models
     public String RFeatures{get; set;}
     public String Address{get; set;}
     public String PhoneNumber{get; set;}
+    public string type { get; set; }
     public List<Comment> Comment{get; set;}
     }
 }

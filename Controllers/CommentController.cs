@@ -11,18 +11,18 @@ using Newtonsoft.Json;
 namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
-    public class BlogController : Controller
+    public class CommentController : Controller
     {
 
         [HttpPost]
-        public async Task<dynamic> Post([FromBody]Post p)
+        public async Task<dynamic> Post([FromBody]Comment c)
         {
             var hc = Helpers.CouchDBConnect.GetClient("posts");
-            var response = await hc.GetAsync("posts/"+p._id);
+            var response = await hc.GetAsync("posts/"+c._id);
             if (response.IsSuccessStatusCode) {
-                Post posts = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
+                Comment comment = (Comment) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Comment));
 
-                string json = JsonConvert.SerializeObject(p);
+                string json = JsonConvert.SerializeObject(c);
                 HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
                 await hc.PostAsync("posts", htc);
 
@@ -35,11 +35,11 @@ namespace CloudProject.Controllers
         }
 
         [HttpPost]
-        [Route("CreatePost")]
-        public async Task<int> CreatePost([FromBody] Post p) {
+        [Route("CreateComment")]
+        public async Task<int> CreateComment([FromBody] Comment c) {
 
             var hc = Helpers.CouchDBConnect.GetClient("posts");
-            string json = JsonConvert.SerializeObject(p);
+            string json = JsonConvert.SerializeObject(c);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
             
@@ -48,32 +48,32 @@ namespace CloudProject.Controllers
         }
 
         [HttpPut]
-        [Route("UpdatePost/{id}")]
-        public async Task<int> UpdatePost(string id,[FromBody] Post p) {
+        [Route("UpdateComment/{id}")]
+        public async Task<int> UpdateComment(string id,[FromBody] Comment c) {
 
             var hc = Helpers.CouchDBConnect.GetClient("posts");
             var getRev = await hc.GetAsync("posts/"+id);
-            var post = (Post) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Post));
-            p._rev=post._rev;
-            string json = JsonConvert.SerializeObject(p);
+            var comment = (Comment) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Comment));
+            c._rev=c._rev;
+            string json = JsonConvert.SerializeObject(c);
           //  var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
            // jsonObject.Remove("_rev"); 
             //json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.PutAsync("posts/"+p._id,htc);
+            var response = await hc.PutAsync("posts/"+c._id,htc);
             Console.WriteLine(response);
             return 1;
         }
 
         [HttpDelete]
-        [Route("DeletePost/{_id}")]
-        public async Task<int> DeletePost(string _id)  
+        [Route("DeleteComment/{_id}")]
+        public async Task<int> DeleteComment(string _id)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("posts");
             var response = await hc.GetAsync("users/"+_id);
-            var post = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
+            var comment = (Comment) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Comment));
           //  var response = await hc.DeleteAsync("posts/"+_id);
-            var response1 = await hc.DeleteAsync("users/"+post._id+"?rev="+post._rev);
+            var response1 = await hc.DeleteAsync("users/"+comment._id+"?rev="+comment._rev);
 
             Console.WriteLine(response1);
             return 1;
