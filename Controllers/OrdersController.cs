@@ -37,7 +37,6 @@ namespace CloudProject.Controllers
         }
 
         [HttpPost]
-       // [Route("CreateOrder/{_id}")]
         [Route("CreateOrder")]
         public async Task<int> CreateOrder([FromBody] Orders o) {
 
@@ -45,6 +44,7 @@ namespace CloudProject.Controllers
             string json = JsonConvert.SerializeObject(o);
             var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
             jsonObject.Remove("_rev");
+            jsonObject.Remove("_id");
             json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
@@ -61,6 +61,7 @@ namespace CloudProject.Controllers
             var getRev = await hc.GetAsync("orders/"+id);
             var order = (Orders) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Orders));
             o._rev=order._rev;
+            o._id=order._id;
             string json = JsonConvert.SerializeObject(o);
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PutAsync("orders/"+id,htc);
@@ -70,17 +71,13 @@ namespace CloudProject.Controllers
 
 
         [HttpDelete]
-        [Route("DeleteOrders/{id}")]
-        
-        //[HttpDelete("DeleteUser/{_id}")]
+        [Route("DeleteOrders/{id}")]  
         public async Task<int> DeleteOrders(string id)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("orders");
             var response = await hc.GetAsync("orders/"+id);
             var order = (Orders) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Orders));
-          //  string json = JsonConvert.SerializeObject(a);
-           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response1 = await hc.DeleteAsync("users/"+order._id+"?rev="+order._rev);
+            var response1 = await hc.DeleteAsync("orders/"+order._id+"?rev="+order._rev);
             Console.WriteLine(response1);
             return 1;
         }

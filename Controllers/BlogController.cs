@@ -40,6 +40,10 @@ namespace CloudProject.Controllers
 
             var hc = Helpers.CouchDBConnect.GetClient("posts");
             string json = JsonConvert.SerializeObject(p);
+            var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+            jsonObject.Remove("_rev");
+            jsonObject.Remove("_id");
+            json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PostAsync("",htc);
             
@@ -55,10 +59,8 @@ namespace CloudProject.Controllers
             var getRev = await hc.GetAsync("posts/"+id);
             var post = (Post) JsonConvert.DeserializeObject(await getRev.Content.ReadAsStringAsync(),typeof(Post));
             p._rev=post._rev;
+            p._id=post._id;
             string json = JsonConvert.SerializeObject(p);
-          //  var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
-           // jsonObject.Remove("_rev"); 
-            //json = jsonObject.ToString();
             HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
             var response = await hc.PutAsync("posts/"+p._id,htc);
             Console.WriteLine(response);
@@ -66,14 +68,13 @@ namespace CloudProject.Controllers
         }
 
         [HttpDelete]
-        [Route("DeletePost/{_id}")]
-        public async Task<int> DeletePost(string _id)  
+        [Route("DeletePost/{id}")]
+        public async Task<int> DeletePost(string id)  
         {
             var hc = Helpers.CouchDBConnect.GetClient("posts");
-            var response = await hc.GetAsync("users/"+_id);
+            var response = await hc.GetAsync("posts/"+id);
             var post = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
-          //  var response = await hc.DeleteAsync("posts/"+_id);
-            var response1 = await hc.DeleteAsync("users/"+post._id+"?rev="+post._rev);
+            var response1 = await hc.DeleteAsync("posts/"+post._id+"?rev="+post._rev);
 
             Console.WriteLine(response1);
             return 1;
