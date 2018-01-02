@@ -9,13 +9,15 @@ namespace CloudProject.Models
 
     public string _id {get; set;}
     public string _rev {get; set;}
-
-     public String FirstName {get; set;}
-     public String LastName {get; set;}
-     public String PhoneNumber {get; set;}
-    public String RestaurantName {get; set;}
+     public string FirstName {get; set;}
+     public string LastName {get; set;}
+     public string PhoneNumber {get; set;}
+    public string RestaurantName {get; set;}
+    public int NumOfPlaces {get; set;}
      public int NumOfPeople {get; set;}
      public DateTime Date {get; set;}
-     public String time {get; set;}
+     public string time {get; set;}
+    public Boolean ValidateReservation{get; set;}
+
     }
 }

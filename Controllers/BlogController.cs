@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
+using CloudProject.Helpers;
+using StackExchange.Redis;
+
 
 
 namespace CloudProject.Controllers
@@ -14,9 +17,24 @@ namespace CloudProject.Controllers
     public class BlogController : Controller
     {
 
+        IDatabase cachingDB;
+
+        public BlogController(IRedisConnectionFactory cachingDB) {
+            this.cachingDB = cachingDB.Connection().GetDatabase();
+        }
+
         [HttpPost]
-        public async Task<dynamic> Post([FromBody]Post p)
+        [Route("NewPost/{token}")]
+        public async Task<dynamic> Post(string token,[FromBody]Post p)
         {
+
+           /* Token t = JsonConvert.DeserializeObject<Token>(cachingDB.StringGet(token));
+            if (t.create.AddMinutes(10) < DateTime.Now)
+            {
+                return false;
+            }
+            else
+            {*/
             var hc = Helpers.CouchDBConnect.GetClient("posts");
             var response = await hc.GetAsync("posts/"+p._id);
             if (response.IsSuccessStatusCode) {
@@ -29,15 +47,21 @@ namespace CloudProject.Controllers
                 return 1;
 
             }
-            
+         //   } 
         return -1;
 
         }
 
         [HttpPost]
-        [Route("CreatePost")]
-        public async Task<int> CreatePost([FromBody] Post p) {
-
+        [Route("CreatePost/{token}")]
+        public async Task<int> CreatePost(string token,[FromBody] Post p) {
+            Token t = JsonConvert.DeserializeObject<Token>(cachingDB.StringGet(token));
+            if (t.create.AddMinutes(10) < DateTime.Now)
+            {
+                return -1;
+            }
+            else
+            {
             var hc = Helpers.CouchDBConnect.GetClient("posts");
             string json = JsonConvert.SerializeObject(p);
             var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
@@ -49,6 +73,7 @@ namespace CloudProject.Controllers
             
             Console.WriteLine(response);
             return 1;
+        }
         }
 
         [HttpPut]
@@ -79,6 +104,7 @@ namespace CloudProject.Controllers
             Console.WriteLine(response1);
             return 1;
         }
+
 
     }
 }

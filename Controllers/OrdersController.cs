@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
+using RawRabbit.Enrichers.MessageContext.Context;
+using RawRabbit;
 
 
 namespace CloudProject.Controllers
@@ -15,6 +17,51 @@ namespace CloudProject.Controllers
     public class OrdersController : Controller
 
     {
+        IBusClient client;
+    public OrdersController(IBusClient _client) 
+    {
+        client = _client;
+        client.SubscribeAsync<Orders,MessageContext>(
+            (order,ctx) => {
+               if(order.NumOfPlaces>=order.NumOfPeople){//the order received
+                   order.ValidateReservation=true;
+                   
+               }
+               else
+               {
+                   order.ValidateReservation=false;
+               }
+                int result=order.NumOfPlaces-order.NumOfPeople;
+                order.NumOfPlaces=result;  //update 
+
+                var hc = Helpers.CouchDBConnect.GetClient("orders");
+                string json = JsonConvert.SerializeObject(order);
+                var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+                jsonObject.Remove("_rev");
+                jsonObject.Remove("_id");
+                json = jsonObject.ToString();
+                HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+                hc.PostAsync("",htc);
+
+                Console.WriteLine("order FirstName: {0} LastName: {1} PhoneNumber: {2}, RestaurantName: {3}, NumOfPeople: {4},time: {5}",order.FirstName, order.LastName, order.PhoneNumber,order.RestaurantName,order.NumOfPeople,order.time);
+                return Task.FromResult(0);
+         }
+         );     
+            
+    }
+        // [HttpGet]
+        // [Route("/init")]
+        // public async void init() {
+        //     await client.PublishAsync(new Orders {
+        //         FirstName = "Ortal",
+        //         LastName = "Yona",
+        //         PhoneNumber = "0528962830",
+        //         RestaurantName = "Cafe",
+        //         NumOfPeople = 2,
+        //         time = "20:30"
+
+        //     });
+        // }  
 
         [HttpPost]
         public async Task<dynamic> Post([FromBody]Orders o)
@@ -41,15 +88,17 @@ namespace CloudProject.Controllers
         public async Task<int> CreateOrder([FromBody] Orders o) {
 
             var hc = Helpers.CouchDBConnect.GetClient("orders");
-            string json = JsonConvert.SerializeObject(o);
-            var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
-            jsonObject.Remove("_rev");
-            jsonObject.Remove("_id");
-            json = jsonObject.ToString();
-            HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.PostAsync("",htc);
+            await client.PublishAsync(o);
+
+            //string json = JsonConvert.SerializeObject(o);
+           // var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+            //jsonObject.Remove("_rev");
+          //  jsonObject.Remove("_id");
+         //   json = jsonObject.ToString();
+           // HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
+           // var response = await hc.PostAsync("",htc);
             
-            Console.WriteLine(response);
+         //   Console.WriteLine(response);
             return 1;
         }
         

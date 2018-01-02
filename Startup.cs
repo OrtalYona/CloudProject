@@ -8,7 +8,24 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace project
+using RawRabbit.Configuration;
+using RawRabbit.DependencyInjection.ServiceCollection;
+using RawRabbit.Enrichers.GlobalExecutionId;
+using RawRabbit.Enrichers.HttpContext;
+using RawRabbit.Enrichers.MessageContext;
+using RawRabbit.Operations.MessageSequence;
+using RawRabbit.Operations.StateMachine;
+using RawRabbit.Instantiation;
+using RawRabbit.Enrichers.MessageContext.Context;
+
+using StackExchange.Redis;
+using CloudProject.Helpers;
+
+
+
+
+
+namespace CloudProject
 {
     public class Startup
     {
@@ -28,7 +45,19 @@ namespace project
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+           // services.AddMvc();
+                       services
+            .AddRawRabbit(new RawRabbitOptions {
+                ClientConfiguration = 
+                    RawRabbit.Common
+                    .ConnectionStringParser.Parse("pibniaca:WbFVWQe0JkUyudLCMwrlmKVEZd08SlV7@golden-kangaroo.rmq.cloudamqp.com/pibniaca"),
+                Plugins = p => p.UseGlobalExecutionId().UseMessageContext<MessageContext>()
+            })
+            .AddMvc();
+
+                        services
+            .AddSingleton<IRedisConnectionFactory,RedisConnectionFactory>()
+            .AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

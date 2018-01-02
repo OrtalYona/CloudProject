@@ -7,19 +7,18 @@ namespace CloudProject.Models
 {
     public class Post
     {
-
-    public String _id {get; set;}
+    public string _id {get; set;}
     public string _rev {get; set;}
-    public String Title{get; set;}
-    public String Writer{get; set;}
-    public String WebSite{get; set;}
+    public string Title{get; set;}
+    public string Writer{get; set;}
+    public string WebSite{get; set;}
     public DateTime PublishDate{get; set;}
-    public String Content{get; set;}
-    public String cuisine{get; set;}
-    public String Meals{get; set;}
-    public String RFeatures{get; set;}
-    public String Address{get; set;}
-    public String PhoneNumber{get; set;}
+    public string Content{get; set;}
+    public string cuisine{get; set;}
+    public string Meals{get; set;}
+    public string RFeatures{get; set;}
+    public string Address{get; set;}
+    public string PhoneNumber{get; set;}
     public string type { get; set; }
     public List<Comment> Comment{get; set;}
     }

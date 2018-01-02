@@ -6,19 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
+using RawRabbit;
+using StackExchange.Redis;
+using  CloudProject.Helpers;
 
 namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-
+    
+        
         static Dictionary<string,Token> ActiveLogins = new Dictionary<string, Token>();
         static List<Account> Users = new List<Account>();
 
         [HttpGet]
         [Route("ValidateSession/{tokenId}")]
-
+        
             public async Task<Boolean> ValidateSession(string tokenId) {
             var hc = Helpers.CouchDBConnect.GetClient("users");
             var response = await hc.GetAsync("/users/"+tokenId);
@@ -46,18 +50,13 @@ namespace CloudProject.Controllers
                 Account account = (Account) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Account));
                 if (account.password.Equals(a.password)) {
                     Token t = new Token();
+                
                     t._id = a._id+":token:"+Guid.NewGuid();
                     t.create = DateTime.Now;
                     t.ttl = 600;
 
-                    HttpContent htc = new StringContent(
-                        JsonConvert.SerializeObject(t),
-                        System.Text.Encoding.UTF8,
-                        "application/json"
-                    );
-
-                    await hc.PostAsync("users", htc);
-
+                    cachingDB.StringSet(t._id.ToString(),JsonConvert.SerializeObject(t));
+                    
                     return t;
                 }
             };
@@ -65,6 +64,7 @@ namespace CloudProject.Controllers
             return -1;
 
         }
+        
 
             async  Task<Boolean> DoesUserExist(Account a) {
             var hc = Helpers.CouchDBConnect.GetClient("users");
@@ -130,6 +130,33 @@ namespace CloudProject.Controllers
             var response1 = await hc.DeleteAsync("users/"+user._id+"?rev="+user._rev);
             Console.WriteLine(response1);
             return 1;
+        }
+
+        
+        IDatabase cachingDB;
+
+        public AccountController(IRedisConnectionFactory caching) {
+            cachingDB = caching.Connection().GetDatabase();
+        }
+
+        [HttpPost]
+        [Route("/WriteToCache/{_id}")]
+        public async Task<IEnumerable<String>> WriteToCache(string _id,[FromBody] Token a) {
+            var hc = Helpers.CouchDBConnect.GetClient("users");
+            var getID = await hc.GetAsync("users/"+_id);
+            var user = (Account) JsonConvert.DeserializeObject(await getID.Content.ReadAsStringAsync(),typeof(Account));
+            a._id=user._id;
+
+            cachingDB.StringSet(a._id.ToString(), Newtonsoft.Json.JsonConvert.SerializeObject(a));
+
+            return new List<string>{"ok"};
+        }
+
+        [HttpGet]
+        [Route("/ReadFromCache/{id}")]
+        public Account ReadFromCache(string id) {
+            Account p = Newtonsoft.Json.JsonConvert.DeserializeObject<Account>(cachingDB.StringGet(id.ToString()));
+            return p;
         }
     }
 }

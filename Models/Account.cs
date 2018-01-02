@@ -9,7 +9,6 @@ namespace CloudProject.Models
 
         public string _id {get; set;}
         public string _rev {get; set;}
-
         public string FirstName{get; set;}
         public string LastName{get; set;}
         public string UserName{get; set;}
