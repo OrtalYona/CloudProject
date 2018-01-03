@@ -53,7 +53,7 @@ namespace CloudProject.Controllers
         }
 */
         [HttpPost]
-        [Route("CreatePost/{token}")]
+        [Route("CreatePost/{token}")]//----------------------------------------------
         public async Task<int> CreatePost(string token,[FromBody] Post p) {
 
             //read from cache the token 

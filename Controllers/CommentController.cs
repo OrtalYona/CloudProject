@@ -44,6 +44,7 @@ namespace CloudProject.Controllers
         [HttpPost]
         [Route("CreateComment/{relatedPost}/{token}")]
         public async Task<int> CreateComment(string relatedPost,string token,[FromBody] Comment c) {
+//            Data d = Newtonsoft.Json.JsonConvert.DeserializeObject<Data>(cachingDB.StringGet(id.ToString()));
 
             //read from cache the token 
             Token t = JsonConvert.DeserializeObject<Token>(cachingDB.StringGet(token));

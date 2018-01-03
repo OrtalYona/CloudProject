@@ -50,7 +50,9 @@ namespace CloudProject.Controllers
             var hc = Helpers.CouchDBConnect.GetClient("users");
             var response = await hc.GetAsync("users/"+a._id);
             if (response.IsSuccessStatusCode) {
-                Account account = (Account) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Account));
+                //--??null
+                string val =await response.Content.ReadAsStringAsync();
+                Account account = (Account) JsonConvert.DeserializeObject(val,typeof(Account));
                 if (account.password.Equals(a.password)) {
                     Token t = new Token();
                 
