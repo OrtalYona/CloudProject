@@ -20,6 +20,7 @@ namespace CloudProject.Controllers
         static Dictionary<string,Token> ActiveLogins = new Dictionary<string, Token>();
         static List<Account> Users = new List<Account>();
 
+//--------------------------------------------------------------------------------------------
         [HttpGet]
         [Route("ValidateSession/{tokenId}")]
         
@@ -40,10 +41,12 @@ namespace CloudProject.Controllers
 
             return false;
         }
+//------------------------------------------------------------------------------------------
+        
         [HttpPost]
         public async Task<dynamic> Post([FromBody]Account a)
         {
-
+            //LogIn
             var hc = Helpers.CouchDBConnect.GetClient("users");
             var response = await hc.GetAsync("users/"+a._id);
             if (response.IsSuccessStatusCode) {
@@ -55,6 +58,7 @@ namespace CloudProject.Controllers
                     t.create = DateTime.Now;
                     t.ttl = 600;
 
+                    //write the token to cache
                     cachingDB.StringSet(t._id.ToString(),JsonConvert.SerializeObject(t));
                     
                     return t;

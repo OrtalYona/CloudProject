@@ -8,6 +8,9 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using RawRabbit.Enrichers.MessageContext.Context;
 using RawRabbit;
+using CloudProject.Helpers;
+using StackExchange.Redis;
+
 
 
 namespace CloudProject.Controllers
@@ -18,8 +21,11 @@ namespace CloudProject.Controllers
 
     {
         IBusClient client;
-    public OrdersController(IBusClient _client) 
+        IDatabase cachingDB;
+
+    public OrdersController(IBusClient _client,IRedisConnectionFactory cachingDB) 
     {
+        this.cachingDB = cachingDB.Connection().GetDatabase();
         client = _client;
         client.SubscribeAsync<Orders,MessageContext>(
             (order,ctx) => {
@@ -63,7 +69,7 @@ namespace CloudProject.Controllers
         //     });
         // }  
 
-        [HttpPost]
+ /*       [HttpPost]
         public async Task<dynamic> Post([FromBody]Orders o)
         {
             var hc = Helpers.CouchDBConnect.GetClient("orders");
@@ -81,12 +87,21 @@ namespace CloudProject.Controllers
             
         return -1;
 
-        }
+        }*/
 
         [HttpPost]
-        [Route("CreateOrder")]
-        public async Task<int> CreateOrder([FromBody] Orders o) {
+        [Route("CreateOrder/{token}")]
+        public async Task<int> CreateOrder(string token,[FromBody] Orders o) {
 
+                        //read from cache the token 
+            Token t = JsonConvert.DeserializeObject<Token>(cachingDB.StringGet(token));
+            if (t.create.AddMinutes(10) < DateTime.Now)
+            {
+                return -1;
+            }
+            
+            else
+            {
             var hc = Helpers.CouchDBConnect.GetClient("orders");
             await client.PublishAsync(o);
 
@@ -100,6 +115,7 @@ namespace CloudProject.Controllers
             
          //   Console.WriteLine(response);
             return 1;
+        }
         }
         
         [HttpPut]

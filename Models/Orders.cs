@@ -15,7 +15,7 @@ namespace CloudProject.Models
     public string RestaurantName {get; set;}
     public int NumOfPlaces {get; set;}
      public int NumOfPeople {get; set;}
-     public DateTime Date {get; set;}
+     public string Date {get; set;} //DateTime
      public string time {get; set;}
     public Boolean ValidateReservation{get; set;}
 

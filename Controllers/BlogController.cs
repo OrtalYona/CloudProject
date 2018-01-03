@@ -23,7 +23,7 @@ namespace CloudProject.Controllers
             this.cachingDB = cachingDB.Connection().GetDatabase();
         }
 
-        [HttpPost]
+  /*      [HttpPost]
         [Route("NewPost/{token}")]
         public async Task<dynamic> Post(string token,[FromBody]Post p)
         {
@@ -35,7 +35,7 @@ namespace CloudProject.Controllers
             }
             else
             {*/
-            var hc = Helpers.CouchDBConnect.GetClient("posts");
+/*            var hc = Helpers.CouchDBConnect.GetClient("posts");
             var response = await hc.GetAsync("posts/"+p._id);
             if (response.IsSuccessStatusCode) {
                 Post posts = (Post) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(),typeof(Post));
@@ -51,18 +51,22 @@ namespace CloudProject.Controllers
         return -1;
 
         }
-
+*/
         [HttpPost]
         [Route("CreatePost/{token}")]
         public async Task<int> CreatePost(string token,[FromBody] Post p) {
+
+            //read from cache the token 
             Token t = JsonConvert.DeserializeObject<Token>(cachingDB.StringGet(token));
             if (t.create.AddMinutes(10) < DateTime.Now)
             {
                 return -1;
             }
+
             else
             {
             var hc = Helpers.CouchDBConnect.GetClient("posts");
+            p.PublishDate=DateTime.Now;
             string json = JsonConvert.SerializeObject(p);
             var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(json);
             jsonObject.Remove("_rev");

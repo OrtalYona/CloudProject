@@ -19,7 +19,7 @@ namespace CloudProject.Models
     public string RFeatures{get; set;}
     public string Address{get; set;}
     public string PhoneNumber{get; set;}
-    public string type { get; set; }
+    public string type { get; set; }// post or comment
     public List<Comment> Comment{get; set;}
     }
 }
